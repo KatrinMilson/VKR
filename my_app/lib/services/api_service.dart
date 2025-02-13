@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:my_app/user.dart'; // Импортируем модель User
 
 class ApiService {
   final String _baseUrl = "http://127.0.0.1:8000/";
@@ -31,27 +30,21 @@ class ApiService {
     }
   }
 
-  // Метод для регистрации пользователя
-  Future<void> register(User user) async {
-    try {
-      await post('api/register/', user.toJson());
-    } catch (error) {
-      throw Exception('Ошибка регистрации: $error');
-    }
-  }
+// Меню
 
-  // Метод для входа пользователя
-  Future<User> login(String phone, String password) async {
-    try {
-      final response = await post('api/login/', {
-        'phone': phone, 
-        'password': password, 
-      });
+Future<List<dynamic>> getMenu() async {
+    final url = Uri.parse('$_baseUrl/api/menu/'); // Используем _baseUrl
+    print('Request URL: $url'); // Логируем URL для отладки
 
+    final response = await http.get(url);
 
-      return User.fromJson(response);
-    } catch (error) {
-      throw Exception('Ошибка входа: $error');
+    if (response.statusCode == 200) {
+      // Декодируем ответ с использованием UTF-8
+      final responseBody = utf8.decode(response.bodyBytes);
+      return jsonDecode(responseBody);
+    } else {
+      throw Exception('Не удалось загрузить меню. Статус код: ${response.statusCode}');
     }
   }
 }
+
